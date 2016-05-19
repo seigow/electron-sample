@@ -1,7 +1,21 @@
 const electron = require('electron');
-const BrowserWindow = electron.remote.BrowserWindow;
+const remote = electron.remote
+const BrowserWindow = remote.BrowserWindow;
 const path = require('path');
-const dialog = electron.remote.dialog
+const dialog = remote.dialog
+const Menu = remote.Menu
+const MenuItem = remote.MenuItem
+
+let menu = new Menu();
+
+menu.append(new MenuItem({ label: "Hello" }))
+menu.append(new MenuItem({type:"separator"}))
+menu.append(new MenuItem({ label: "Electron", type: "checkbox", checked: true}))
+
+window.addEventListener("contextmenu", function(e){
+  e.preventDefault();
+  menu.popup(remote.getCurrentWindow())
+}, false)
 
 const newWindowBtn = document.getElementById('new-window');
 newWindowBtn.addEventListener('click', function(event){
