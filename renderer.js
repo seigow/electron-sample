@@ -5,6 +5,8 @@ const path = require('path');
 const dialog = remote.dialog
 const Menu = remote.Menu
 const MenuItem = remote.MenuItem
+const shell = electron.shell
+const os = require('os')
 
 let menu = new Menu();
 
@@ -111,3 +113,29 @@ newFramelessWindowBtn.addEventListener('click', function(event){
   }
 
 });
+
+// open file mangager
+const fileManagerBtn = document.getElementById('open-file-manager')
+
+fileManagerBtn.addEventListener('click', function(event){
+  shell.showItemInFolder(os.homedir())
+})
+
+// external links
+const exLinksBtn = document.getElementById('open-ex-links');
+
+exLinksBtn.addEventListener('click', function(){
+  shell.openExternal('http://electron.atom.io')
+})
+
+// open all outbound links externally
+const links = document.querySelectorAll("a[href]")
+Array.prototype.forEach.call(links, function(link){
+  const url = link.getAttribute('href');
+  if(url.indexOf('http') === 0){
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+      shell.openExternal(url);
+    })
+  }
+})
