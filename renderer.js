@@ -7,6 +7,7 @@ const Menu = remote.Menu
 const MenuItem = remote.MenuItem
 const shell = electron.shell
 const os = require('os')
+const ipc = electron.ipcRenderer
 
 let menu = new Menu();
 
@@ -138,4 +139,47 @@ Array.prototype.forEach.call(links, function(link){
       shell.openExternal(url);
     })
   }
+})
+
+// Open a file or directory
+const selectDirBtn = document.getElementById('select-directory')
+
+selectDirBtn.addEventListener('click', function(event){
+  ipc.send('open-file-dialog')
+})
+
+ipc.on('selected-directory', function(event, path){
+  document.getElementById('selected-file').innerHTML = `You selected: ${path}`
+})
+
+// Error dialog
+const errorBtn = document.getElementById('error-dialog')
+errorBtn.addEventListener('click', function(event){
+  ipc.send('open-error-dialog')
+})
+
+// Information dialog
+const informationBtn = document.getElementById('information-dialog')
+
+informationBtn.addEventListener('click', function(event){
+  ipc.send('open-information-dialog')
+})
+
+ipc.on('information-dialog-selection', function(event, index){
+  let message = 'You selected ';
+  if (index === 0) message += 'yes.';
+  else message += 'no.';
+  document.getElementById('info-selection').innerHTML = message
+})
+
+// Save dialog
+const saveBtn = document.getElementById('save-dialog')
+
+saveBtn.addEventListener('click', function(event){
+  ipc.send('save-dialog')
+})
+
+ipc.on('saved-file', function(event, path){
+  if(!path) path = 'No path'
+  document.getElementById('file-saved').innerHTML = `Path selected: ${path}`
 })
