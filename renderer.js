@@ -183,3 +183,26 @@ ipc.on('saved-file', function(event, path){
   if(!path) path = 'No path'
   document.getElementById('file-saved').innerHTML = `Path selected: ${path}`
 })
+
+// Put app in the tray
+const trayBtn = document.getElementById('put-in-tray')
+let trayOn = false
+
+trayBtn.addEventListener('click', function(event){
+  if(trayOn){
+    trayOn = false;
+    document.getElementById('tray-countdown').innerHTML = '';
+    ipc.send('remove-tray')
+  } else{
+    trayOn = true;
+    const message = 'Click button again to remove';
+    document.getElementById('tray-countdown').innerHTML = message;
+    ipc.send('put-in-tray')
+  }
+})
+
+// Tray removed from context menu
+ipc.on('tray-remoded', function(){
+  trayOn = false;
+  document.getElementById('tray-countdown').innerHTML = ''
+})
