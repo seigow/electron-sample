@@ -22,7 +22,7 @@ window.addEventListener("contextmenu", function(e){
 
 const newWindowBtn = document.getElementById('new-window');
 newWindowBtn.addEventListener('click', function(event){
-  const modalPath = path.join('file://', __dirname, '/subwindow.html');
+  const modalPath = path.join('file://', __dirname, 'subwindow.html');
   subWindow = new BrowserWindow({width: 400, height:320});
 
   subWindow.webContents.on('crashed', function(){
@@ -70,7 +70,8 @@ newWindowBtn.addEventListener('click', function(event){
 
 const newFramelessWindowBtn = document.getElementById('new-frameless-window');
 newFramelessWindowBtn.addEventListener('click', function(event){
-  const modalPath = path.join('file://', __dirname, '/subwindow.html');
+  const modalPath = path.join('file://', __dirname, 'subwindow.html');
+  console.log(modalPath)
   subWindow = new BrowserWindow({width: 400, height:320, frame:false});
 
   subWindow.webContents.on('crashed', function(){
@@ -205,4 +206,44 @@ trayBtn.addEventListener('click', function(event){
 ipc.on('tray-remoded', function(){
   trayOn = false;
   document.getElementById('tray-countdown').innerHTML = ''
+})
+
+// Asynchronous messages
+const asyncMsgBtn = document.getElementById('async-msg')
+asyncMsgBtn.addEventListener('click', function(){
+  ipc.send('asynchronous-message', 'ping')
+})
+
+ipc.on('asynchronous-reply', function(event, arg){
+  const message = `Asynchronous message reply: ${arg}`;
+  document.getElementById('async-reply').innerHTML = message
+})
+
+// Synchronous messages
+const syncMsgBtn = document.getElementById('sync-msg')
+syncMsgBtn.addEventListener('click', function(){
+  const reply = ipc.sendSync('synchronous-message', 'ping');
+  const message = `Synchronous message reply: ${reply}`
+  document.getElementById('sync-reply').innerHTML = message
+})
+
+// Communicate with a invisible window
+const invisMsgBtn = document.getElementById('invis-msg')
+const invisReply = document.getElementById('invis-reply')
+
+invisMsgBtn.addEventListener('click', function (clickEvent) {
+  const windowID = BrowserWindow.getFocusedWindow().id
+  const invisPath = path.join('file://', __dirname, 'invisible.html');
+  let win = new BrowserWindow({ width: 400, height: 400, show: false })
+  win.loadURL(invisPath)
+
+  win.webContents.on('did-finish-load', function () {
+    const input = 100
+    win.webContents.send('compute-factorial', input, windowID)
+  })
+})
+
+ipc.on('factorial-computed', function (event, input, output) {
+  const message = `The factorial of ${input} is ${output}`
+  invisReply.textContent = message
 })
