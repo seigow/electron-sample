@@ -8,6 +8,7 @@ const MenuItem = remote.MenuItem
 const shell = electron.shell
 const os = require('os')
 const ipc = electron.ipcRenderer
+const electronScreen = electron.screen
 
 let menu = new Menu();
 
@@ -246,4 +247,43 @@ invisMsgBtn.addEventListener('click', function (clickEvent) {
 ipc.on('factorial-computed', function (event, input, output) {
   const message = `The factorial of ${input} is ${output}`
   invisReply.textContent = message
+})
+
+// Get aop information
+const appInfoBtn = document.getElementById('app-info')
+
+appInfoBtn.addEventListener('click', function(){
+  ipc.send('get-app-path')
+})
+
+ipc.on('got-app-path', function(event, path){
+  const message = `This app is located at: ${path}`;
+  document.getElementById('got-app-info').innerHTML = message
+})
+
+// Get version info
+const versionInfoBtn = document.getElementById('version-info')
+const electronVersion = process.versions.electron
+
+versionInfoBtn.addEventListener('click', function(){
+  const message = `This app is using Electron version: ${electronVersion}`;
+  document.getElementById('got-version-info').innerHTML = message
+})
+
+// Get system information
+const homeDir = os.homedir();
+const sysInfoBtn = document.getElementById('sys-info')
+
+sysInfoBtn.addEventListener('click', function(){
+  const message = `Your system home directory is: ${homeDir}`;
+  document.getElementById('got-sys-info').innerHTML = message
+})
+
+// Get screen information
+const screenInfoBtn = document.getElementById('screen-info');
+const size = electronScreen.getPrimaryDisplay().workAreaSize;
+
+screenInfoBtn.addEventListener('click', function(){
+  const message = `Your screen is ${size.width} px x ${size.height} px`;
+  document.getElementById('got-screen-info').innerHTML = message
 })
