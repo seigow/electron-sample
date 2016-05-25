@@ -9,6 +9,7 @@ const shell = electron.shell
 const os = require('os')
 const ipc = electron.ipcRenderer
 const electronScreen = electron.screen
+const clipboard = electron.clipboard
 
 let menu = new Menu();
 
@@ -286,4 +287,22 @@ const size = electronScreen.getPrimaryDisplay().workAreaSize;
 screenInfoBtn.addEventListener('click', function(){
   const message = `Your screen is ${size.width} px x ${size.height} px`;
   document.getElementById('got-screen-info').innerHTML = message
+})
+
+// Copy 
+const copyBtn = document.getElementById('copy')
+const copyInput = document.getElementById('copy-input')
+
+copyBtn.addEventListener('click', function(){
+  if(copyInput.value !== '') copyInput.value = '';
+  copyInput.placeholder = 'Copied! Paste here to ses.';
+  clipboard.writeText('Electron Demo!')
+})
+
+// Paste
+const pasteBtn = document.getElementById('paste')
+pasteBtn.addEventListener('click', function(){
+  clipboard.writeText('Paste Demo');
+  const message = `Clipboard contents: ${clipboard.readText()}`;
+  document.getElementById('paste-to').innerHTML = message
 })
